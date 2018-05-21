@@ -1,0 +1,44 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="../constitution-service/constitution-service.html">
+<link rel="import" href="constitution-card.html">
+
+<polymer-element name="constitution-list" attributes="show">
+  <template>
+    <style>
+    :host {
+      display: block;
+      width: 100%;
+    }
+    constitution-card {
+      margin-bottom: 30px;
+    }
+    </style>
+
+    <constitution-service id="service" constitution="{{constitution}}">
+</constitution-service>
+
+<div layout vertical center>
+
+  <template repeat="{{c in constitution}}">
+    <constitution-card>
+      <h2>{{c.uid}}</h2>
+      <p>{{c.text}}</p>
+      <p>{{c.part}}</p>
+      <p>{{c.numbers}}</p>
+    </constitution-card>
+  </template>
+
+</div>
+
+  </template>
+
+  <script>
+  Polymer({
+    handleFavorite: function(event, detail, sender) {
+      var constitution = sender.templateInstance.model.constitution;
+      console.log('constitution logged out in constitiotion list', constitution)
+    }
+  });
+  </script>
+
+</polymer-element>

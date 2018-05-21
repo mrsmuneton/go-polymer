@@ -1,0 +1,66 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+<!--
+  `<constitution-service>` rendering the constitution
+
+  @element constitution-service
+  @demo
+  @homepage http://www.polymer-project.org/docs/start/tutorial.html
+-->
+
+<!--
+  An array of constitution objects, with the following format:
+
+  <table border="0">
+    <tr>
+      <td><code>uid</code></td>
+      <td>Number</td>
+      <td>Unique ID for this constitution.</td>
+    </tr>
+     <tr>
+      <td><code>level</code></td>
+      <td>Number</td>
+      <td>Indention level (array depth).</td>
+    </tr>
+     <tr>
+      <td><code>part</code></td>
+      <td>String</td>
+      <td>Array label.</td>
+    </tr>
+    <tr>
+      <td><code>text</code></td>
+      <td>String</td>
+      <td>Text value.</td>
+    </tr>
+  </table>
+
+  @attribute constitution
+  @type Array
+  @default []
+-->
+<polymer-element name="constitution-service" attributes="constitution">
+  <template>
+    <style>
+    :host {
+      display: block;
+    }
+    </style>
+    <core-ajax id="ajax"
+      auto
+      url="/api/constitution"
+      on-core-response="{{constitutionLoaded}}"
+      handleAs="json">
+    </core-ajax>
+  </template>
+  <script>
+  Polymer('constitution-service', {
+    created: function() {
+      this.constitution = [];
+    },
+    constitutionLoaded: function() {
+      // Make a copy of the loaded data
+      this.constitution = this.$.ajax.response.slice(0);
+    }
+  });
+  </script>
+</polymer-element>

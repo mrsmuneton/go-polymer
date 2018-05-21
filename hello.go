@@ -3,11 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
 	"mime"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 func init() {
@@ -18,6 +19,7 @@ func init() {
 	r := mux.NewRouter()
 	sr := r.PathPrefix("/api").Subrouter()
 	sr.HandleFunc("/posts", Posts)
+	sr.HandleFunc("/constitution", SendConstitution)
 	r.HandleFunc("/{rest:.*}", handler)
 	http.Handle("/", r)
 }
@@ -35,6 +37,13 @@ type Post struct {
 	Favorite bool   `json:"favorite"`
 }
 
+type Constitution struct {
+	Uid    string `json:"uid"`
+	Text   string `json:"text"`
+	Number string `json:"number"`
+	Part   string `json:"part"`
+}
+
 func Posts(w http.ResponseWriter, r *http.Request) {
 	posts := []Post{}
 	// you'd use a real database here
@@ -50,6 +59,30 @@ func Posts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	bs, err := json.Marshal(posts)
+	if err != nil {
+		ReturnError(w, err)
+		return
+	}
+	fmt.Fprint(w, string(bs))
+}
+
+func SendConstitution(w http.ResponseWriter, r *http.Request) {
+	println(" sending constitution ")
+	constitution := []Constitution{}
+	// you'd use a real database here
+	file, err := ioutil.ReadFile("Constitution.json")
+	if err != nil {
+		log.Println("Error reading Constitution.json:", err)
+		panic(err)
+	}
+	fmt.Printf("file: %s\n", string(file))
+	err = json.Unmarshal(file, &constitution)
+	if err != nil {
+		log.Println("Error unmarshalling Constitution.json:", err)
+	}
+
+	bs, err := json.Marshal(constitution)
+	// fmt.Printf("bs", var)
 	if err != nil {
 		ReturnError(w, err)
 		return
