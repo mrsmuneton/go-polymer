@@ -20,6 +20,7 @@ func init() {
 	sr := r.PathPrefix("/api").Subrouter()
 	sr.HandleFunc("/posts", Posts)
 	sr.HandleFunc("/constitution", SendConstitution)
+	r.HandleFunc("/health", healthHandler)
 	r.HandleFunc("/{rest:.*}", handler)
 	http.Handle("/", r)
 }
@@ -27,6 +28,10 @@ func init() {
 func handler(w http.ResponseWriter, r *http.Request) {
 	log.Println("path:", r.URL.Path)
 	http.ServeFile(w, r, "static/"+r.URL.Path)
+}
+
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "ok")
 }
 
 type Post struct {
@@ -58,12 +63,12 @@ func Posts(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error unmarshalling posts.json:", err)
 	}
 
-	bs, err := json.Marshal(posts)
+	val, err := json.Marshal(posts)
 	if err != nil {
 		ReturnError(w, err)
 		return
 	}
-	fmt.Fprint(w, string(bs))
+	fmt.Fprint(w, string(val))
 }
 
 func SendConstitution(w http.ResponseWriter, r *http.Request) {
@@ -81,13 +86,13 @@ func SendConstitution(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error unmarshalling Constitution.json:", err)
 	}
 
-	bs, err := json.Marshal(constitution)
-	// fmt.Printf("bs", var)
+	val, err := json.Marshal(constitution)
+	// fmt.Printf("val", var)
 	if err != nil {
 		ReturnError(w, err)
 		return
 	}
-	fmt.Fprint(w, string(bs))
+	fmt.Fprint(w, string(val))
 }
 
 func ReturnError(w http.ResponseWriter, err error) {

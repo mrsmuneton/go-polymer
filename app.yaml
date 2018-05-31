@@ -1,8 +1,2 @@
-application: go-polymer
-version: 1
+env: flex
 runtime: go
-api_version: go1
-
-handlers:
-- url: /.*
-  script: _go_app
