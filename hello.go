@@ -7,6 +7,7 @@ import (
 	"log"
 	"mime"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -20,6 +21,7 @@ func init() {
 	sr := r.PathPrefix("/api").Subrouter()
 	sr.HandleFunc("/posts", Posts)
 	sr.HandleFunc("/constitution", SendConstitution)
+	r.HandleFunc("/chain", Chain)
 	r.HandleFunc("/health", healthHandler)
 	r.HandleFunc("/{rest:.*}", handler)
 	http.Handle("/", r)
@@ -32,6 +34,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "ok")
+}
+
+func chainHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "chain")
 }
 
 type Post struct {
@@ -47,6 +53,48 @@ type Constitution struct {
 	Text   string `json:"text"`
 	Number string `json:"number"`
 	Part   string `json:"part"`
+}
+
+type Block struct {
+	Uid          string    `json:"number"`
+	Timestamp    time.Time `json:"timestamp"`
+	Data         string    `json:"data"`
+	PreviousHash string    `json:previoushash`
+	hash         string    `json:hash`
+}
+
+func Chain(w http.ResponseWriter, r *http.Request) {
+	blocks := []Block{}
+	file, err := ioutil.ReadFile("blocks.json")
+	if err != nil {
+		log.Println("Error reading blocks.json:", err)
+		panic(err)
+	}
+	fmt.Printf("file: %s\n", string(file))
+	err = json.Unmarshal(file, &blocks)
+	if err != nil {
+		log.Println("Error unmarshalling blocks.json:", err)
+	}
+
+	for i, _ := range blocks {
+		blocks[i].Timestamp = time.Now()
+		fmt.Println(blocks[i])
+	}
+
+	val, err := json.Marshal(blocks)
+	if err != nil {
+		ReturnError(w, err)
+		return
+	}
+
+	// fmt.Printf("value: %s\n", string(val))
+	// fmt.Println(reflect.TypeOf(val.))
+
+	fmt.Fprint(w, string(val))
+}
+
+func getBlock(hash, data) {
+
 }
 
 func Posts(w http.ResponseWriter, r *http.Request) {
