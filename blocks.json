@@ -1,7 +1,7 @@
 [
   {
     "uid": 1,
-    "data" : "I am love, i am light! i am happy, I have peace.",
+    "textvalue" : "I am love, i am light! i am happy, I have peace.",
     "previousHash" : "0",
     "hash": "08045a86ec6dc810e61313b2655bc28069c9f414a273d813a6176ac8e170da8b"
   }

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -58,9 +60,9 @@ type Constitution struct {
 type Block struct {
 	Uid          string    `json:"number"`
 	Timestamp    time.Time `json:"timestamp"`
-	Data         string    `json:"data"`
+	TextValue    string    `json:"textvalue"`
 	PreviousHash string    `json:previoushash`
-	hash         string    `json:hash`
+	Hash         string    `json:hash`
 }
 
 func Chain(w http.ResponseWriter, r *http.Request) {
@@ -78,6 +80,7 @@ func Chain(w http.ResponseWriter, r *http.Request) {
 
 	for i, _ := range blocks {
 		blocks[i].Timestamp = time.Now()
+		sha256hash(&blocks[i])
 		fmt.Println(blocks[i])
 	}
 
@@ -93,8 +96,10 @@ func Chain(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(val))
 }
 
-func getBlock(hash, data) {
-
+func sha256hash(thisblock *Block) {
+	h := sha256.New()
+	h.Write([]byte(thisblock.TextValue))
+	thisblock.Hash = hex.EncodeToString(h.Sum(nil))
 }
 
 func Posts(w http.ResponseWriter, r *http.Request) {
