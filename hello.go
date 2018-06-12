@@ -89,16 +89,15 @@ func Chain(w http.ResponseWriter, r *http.Request) {
 		ReturnError(w, err)
 		return
 	}
-
-	// fmt.Printf("value: %s\n", string(val))
-	// fmt.Println(reflect.TypeOf(val.))
-
 	fmt.Fprint(w, string(val))
 }
 
 func sha256hash(thisblock *Block) {
 	h := sha256.New()
+	h.Write([]byte(thisblock.Uid))
+	h.Write([]byte(thisblock.Timestamp.String()))
 	h.Write([]byte(thisblock.TextValue))
+	h.Write([]byte(thisblock.PreviousHash))
 	thisblock.Hash = hex.EncodeToString(h.Sum(nil))
 }
 
